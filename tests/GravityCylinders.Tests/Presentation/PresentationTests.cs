@@ -97,4 +97,23 @@ public class PresentationTests : InvariantCultureTest
     [InlineData(1.98, "1.98")]
     public void Signed_NeverRoundsAMassiveBodyUpToC(double beta, string expected) =>
         Assert.Equal(expected, HudFormatter.Signed(beta));
+
+    [Theory]
+    [InlineData(1.0, "× 1")]
+    [InlineData(2.125, "× 2.125")]
+    [InlineData(1.00020002, "× (1 + 2e-4)")]
+    [InlineData(1.0000002, "× (1 + 2e-7)")]
+    public void CouplingText_ShowsSmallGrExcess(double coupling, string expected) =>
+        Assert.Equal(expected, ForceTableBuilder.CouplingText(coupling));
+
+    [Fact]
+    public void Build_ShowsPerFrameMetreSoTheBreakdownCloses()
+    {
+        // Final review minor: per proper metre × overlap ≠ total when γ ≠ 1; per frame metre × overlap = total.
+        Cylinder[] scene = [new(1e12, 3e5, 0.1, -3, 0.6), new(1e12, 3e5, 0.1, 0, 0), new(1e12, 3e5, 0.1, 1e9, 0)];
+        var forces = ForceSolver.Solve(scene, PhysicsModel.GeneralRelativity, FrameChoice.Cylinder2);
+        var row = ForceTableBuilder.Build(forces)[0].Pairs[0];
+        Assert.Equal(Phys.Eng(forces.Cylinders[0].Pairs[0].PerFrameLength, "N/m"), row.PerFrameMetre);
+        Assert.Contains("per frame metre × overlap", ForceTableBuilder.Footnote);
+    }
 }

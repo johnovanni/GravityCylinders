@@ -130,17 +130,18 @@
                 <StackPanel>
                     <Grid Margin="0,0,0,4">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="110" /><ColumnDefinition Width="140" /><ColumnDefinition Width="120" />
-                            <ColumnDefinition Width="90" /><ColumnDefinition Width="130" /><ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="110" /><ColumnDefinition Width="140" /><ColumnDefinition Width="115" />
+                            <ColumnDefinition Width="110" /><ColumnDefinition Width="115" /><ColumnDefinition Width="140" />
+                            <ColumnDefinition Width="90" /><ColumnDefinition Width="120" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Cylinder" Foreground="#FF8FA3BF" />
                         <TextBlock Grid.Column="1" Text="Source" Foreground="#FF8FA3BF" />
                         <TextBlock Grid.Column="2" Text="Newton per m" Foreground="#FF8FA3BF" />
                         <TextBlock Grid.Column="3" Text="GR factor" Foreground="#FF8FA3BF" />
-                        <TextBlock Grid.Column="4" Text="Per element (÷γ)" Foreground="#FF8FA3BF" />
-                        <TextBlock Grid.Column="5" Text="Overlap" Foreground="#FF8FA3BF" />
-                        <TextBlock Grid.Column="6" Text="Total in frame" Foreground="#FF8FA3BF" />
+                        <TextBlock Grid.Column="4" Text="Per frame metre" Foreground="#FF8FA3BF" />
+                        <TextBlock Grid.Column="5" Text="Per proper metre (÷γ)" Foreground="#FF8FA3BF" />
+                        <TextBlock Grid.Column="6" Text="Overlap" Foreground="#FF8FA3BF" />
+                        <TextBlock Grid.Column="7" Text="Total in frame" Foreground="#FF8FA3BF" />
                     </Grid>
                     <ItemsControl ItemsSource="{Binding Rows}">
                         <ItemsControl.ItemTemplate>
@@ -164,16 +165,17 @@
                                             <DataTemplate>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="110" /><ColumnDefinition Width="140" /><ColumnDefinition Width="120" />
-                                                        <ColumnDefinition Width="90" /><ColumnDefinition Width="130" /><ColumnDefinition Width="110" />
-                                                        <ColumnDefinition Width="120" />
+                                                        <ColumnDefinition Width="110" /><ColumnDefinition Width="140" /><ColumnDefinition Width="115" />
+                                                        <ColumnDefinition Width="110" /><ColumnDefinition Width="115" /><ColumnDefinition Width="140" />
+                                                        <ColumnDefinition Width="90" /><ColumnDefinition Width="120" />
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Grid.Column="1" Text="{Binding Source}" />
                                                     <TextBlock Grid.Column="2" Text="{Binding NewtonianPerMetre}" />
                                                     <TextBlock Grid.Column="3" Text="{Binding Coupling}" />
-                                                    <TextBlock Grid.Column="4" Text="{Binding PerElement}" />
-                                                    <TextBlock Grid.Column="5" Text="{Binding Overlap}" />
-                                                    <TextBlock Grid.Column="6" Text="{Binding Total}" />
+                                                    <TextBlock Grid.Column="4" Text="{Binding PerFrameMetre}" />
+                                                    <TextBlock Grid.Column="5" Text="{Binding PerElement}" />
+                                                    <TextBlock Grid.Column="6" Text="{Binding Overlap}" />
+                                                    <TextBlock Grid.Column="7" Text="{Binding Total}" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -182,6 +184,7 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                    <TextBlock Text="{Binding TableFootnote}" TextWrapping="Wrap" Foreground="#FF8FA3BF" Margin="0,8,0,0" />
                     <TextBlock Text="{Binding ModelHelpText}" TextWrapping="Wrap" Foreground="#FFB8C2D0" Margin="0,8,0,0" />
                     <TextBlock Text="{Binding SimultaneityNote}" TextWrapping="Wrap" Foreground="#FF8FA3BF" Margin="0,4,0,0" />
                 </StackPanel>

@@ -101,6 +101,7 @@ public sealed class MainViewModel : ObservableObject
     /// <summary>Completes when the latest background metric check has finished (for tests and diagnostics).</summary>
     public Task CheckCompletion { get; private set; } = Task.CompletedTask;
     public string ModelHelpText => HudFormatter.ModelHelp(_model);
+    public string TableFootnote => ForceTableBuilder.Footnote;
     public string SimultaneityNote => HudFormatter.SimultaneityNoteFor(_model);
 
     public string ValidationMessage { get => _validationMessage; private set => Set(ref _validationMessage, value); }
