@@ -7,8 +7,10 @@ namespace GravityCylinders.Physics;
 /// frame k each element feels f/γᵢₖ (time dilation), and per metre of frame k that is f again.
 /// </para>
 /// <para>
-/// Totals: which parts of two sliding cylinders overlap "at one moment" depends on the frame, so totals use frame k's
-/// own geometry: K·F_seg(λᵢ, Lᵢ/γᵢₖ, λⱼ, Lⱼ/γⱼₖ, d).
+/// Totals: which parts of two sliding cylinders overlap "at one moment" depends on the frame, so totals are summed over
+/// i's elements as they lie in frame k (length Lᵢ/γᵢₖ) in the boosted field of source j, Φⱼ(γⱼₖx). Substituting
+/// x′ = γⱼₖx turns this into the exact closed form K·F_seg(λᵢ, γⱼₖLᵢ/γᵢₖ, λⱼ, Lⱼ, d)/γⱼₖ, whose long-cylinder limit is
+/// f × min(Lᵢ/γᵢₖ, Lⱼ/γⱼₖ).
 /// </para>
 /// </summary>
 public static class ForceSolver
@@ -46,7 +48,8 @@ public static class ForceSolver
                     PerProperLengthInFrame: newtonian * coupling / gammas[i],
                     PerFrameLength: newtonian * coupling,
                     OverlapInFrame: Math.Min(lengthOn, lengthSource),
-                    TotalInFrame: sign * coupling * FiniteSegment.Force(on.Lambda, lengthOn, source.Lambda, lengthSource, d)));
+                    TotalInFrame: sign * coupling
+                        * FiniteSegment.Force(on.Lambda, gammas[j] * lengthOn, source.Lambda, source.Length, d) / gammas[j]));
             }
             results.Add(new CylinderForces(i, betas[i], gammas[i], on.Length / gammas[i], pairs,
                 Snap(pairs.Select(p => p.PerFrameLength)), Snap(pairs.Select(p => p.TotalInFrame))));

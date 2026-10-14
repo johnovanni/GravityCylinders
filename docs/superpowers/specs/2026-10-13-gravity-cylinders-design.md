@@ -67,9 +67,11 @@ Observer frame k ∈ {Lab, 1, 2, 3} with lab velocity β_k (0 for Lab). SR/GR: �
 - Total force on i in frame k: the elements of i that overlap j *at one instant of frame k* depend on k's
   simultaneity (sliding cylinders), so totals are computed in frame k's own geometry:
 
-    F_i←j^k = K(wᵢⱼ) · F_seg(λᵢ, Lᵢ/γ_ik, λⱼ, Lⱼ/γ_jk, dᵢⱼ)
+    F_i←j^k = K(wᵢⱼ) · F_seg(λᵢ, γ_jk·Lᵢ/γ_ik, λⱼ, Lⱼ, dᵢⱼ) / γ_jk
 
-  (per-k-length mass of i is γ_ik λᵢ, times 1/γ_ik for dt_k; the source field per element uses its proper density).
+  (i's elements over its frame-k length Lᵢ/γ_ik, mass per k-length γ_ik λᵢ times 1/γ_ik for dt_k, in the boosted
+  field of j, Φⱼ(γ_jk x); substituting x′ = γ_jk x gives this exact form — amended after final review, the earlier
+  "static contracted segment" form had the wrong end-fringe width d instead of d/γ_jk).
   For long cylinders this is f_i←j × overlap length in frame k, overlap = min(Lᵢ/γ_ik, Lⱼ/γ_jk). Totals therefore
   differ between frames even though per-length forces do not — a genuine relativity-of-simultaneity effect the HUD
   points out. With equal proper lengths, rest-frame totals obey F_i←j^(i) = −F_j←i^(j).
@@ -80,7 +82,7 @@ Observer frame k ∈ {Lab, 1, 2, 3} with lab velocity β_k (0 for Lab). SR/GR: �
 frame k; Φⱼ evaluated at the source rest-frame coordinate x′ = γ_jk(x − β_jk x⁰)), takes Christoffel symbols by central
 finite differences, and integrates −c² Γʸ_αβ Uᵅ Uᵝ / γ_ik over the elements of i as they lie in frame k at x⁰ = 0
 (mass per k-length γ_ik λᵢ). The HUD shows "direct in frame k: … (Δ = …%)". Tests assert agreement with §1.4's total
-for long cylinders (it differs only in the end-fringe shape).
+exactly (up to quadrature error), at any length.
 
 ## 2. Scene, inputs and UI
 

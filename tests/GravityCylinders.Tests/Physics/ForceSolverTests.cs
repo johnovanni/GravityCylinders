@@ -118,4 +118,33 @@ public class ForceSolverTests
         Cylinder[] scene = [Cyl(0, -3, lambda: 1e12), Cyl(0, 0, lambda: 5e12), Cyl(0, 3, lambda: 2e12)];
         AssertClose(Phys.G * 5e12 / (Phys.C * Phys.C), ForceSolver.Solve(scene, PhysicsModel.Newtonian, FrameChoice.Lab).WeakFieldParameter);
     }
+
+    [Fact]
+    public void FrameTotals_MatchDirectMetricEvenForShortCylinders()
+    {
+        // Final review Critical #1: a moving source's end-fringe is d/γ wide, not d, so the total must use the boosted field.
+        Cylinder[] scene = [Cyl(0.95, -3, length: 60), Cyl(-0.95, 0, length: 60), Cyl(0.3, 3, length: 60)];
+        foreach (var frame in AllFrames)
+        {
+            var solved = ForceSolver.Solve(scene, PhysicsModel.GeneralRelativity, frame);
+            for (int i = 0; i < 3; i++)
+            {
+                var c = solved.Cylinders[i];
+                double scale = c.Pairs.Sum(p => Math.Abs(p.TotalInFrame));
+                double direct = WeakFieldMetricCheck.NetForceInFrame(scene, i, solved.FrameBeta, 8000);
+                AssertClose(c.NetTotal, direct, 0, 1e-3 * scale);
+            }
+        }
+    }
+
+    [Fact]
+    public void CoMoving_LabTotalIsRestTotalOverGamma()
+    {
+        var pair = Pair(ForceSolver.Solve(Scene(0.5, 0.5, 0.5), PhysicsModel.GeneralRelativity, FrameChoice.Lab), 0, 1);
+        double restTotal = FiniteSegment.Force(Lambda, 60, Lambda, 60, D);
+        Cylinder[] shortScene = [Cyl(0.5, -3, length: 60), Cyl(0.5, 0, length: 60), Cyl(0.5, 3, length: 60)];
+        var shortPair = Pair(ForceSolver.Solve(shortScene, PhysicsModel.GeneralRelativity, FrameChoice.Lab), 0, 1);
+        AssertClose(restTotal / Phys.Gamma(0.5), shortPair.TotalInFrame, 1e-12);
+        Assert.True(pair.TotalInFrame > 0);
+    }
 }
