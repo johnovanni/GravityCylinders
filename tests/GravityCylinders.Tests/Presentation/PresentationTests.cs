@@ -87,4 +87,14 @@ public class PresentationTests : InvariantCultureTest
         Assert.Equal("0 N", rows[1].NetTotal);
         Assert.Equal("0 N/m", rows[1].NetPerMetre);
     }
+
+    [Theory]
+    [InlineData(0.5, "0.5")]
+    [InlineData(-0.6, "−0.6")]
+    [InlineData(0.999949, "0.999949")]
+    [InlineData(-0.99995, "−0.99995")]
+    [InlineData(0.998686, "0.998686")]
+    [InlineData(1.98, "1.98")]
+    public void Signed_NeverRoundsAMassiveBodyUpToC(double beta, string expected) =>
+        Assert.Equal(expected, HudFormatter.Signed(beta));
 }

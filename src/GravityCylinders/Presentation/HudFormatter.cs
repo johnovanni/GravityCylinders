@@ -57,6 +57,15 @@ public static class HudFormatter
             "feel exactly Newton's force, and the pull grows steeply as w approaches c. Frames work as in special relativity.",
     };
 
-    /// <summary>A number with a true minus sign, e.g. −0.6.</summary>
-    public static string Signed(double value) => value.ToString("0.###").Replace('-', '−');
+    /// <summary>
+    /// A speed with a true minus sign, e.g. −0.6. Speeds of 0.99c and above get enough digits that a massive body is
+    /// never shown as moving at exactly c.
+    /// </summary>
+    public static string Signed(double value)
+    {
+        double magnitude = Math.Abs(value);
+        string text = value.ToString(magnitude >= 0.99 && magnitude < 1 ? "0.######" : "0.###");
+        if (magnitude < 1 && text.TrimStart('-') == "1") text = value.ToString("0.############");
+        return text.Replace('-', '−');
+    }
 }
