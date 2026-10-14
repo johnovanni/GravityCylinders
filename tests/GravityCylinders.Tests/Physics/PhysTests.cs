@@ -20,9 +20,20 @@ public class PhysTests : InvariantCultureTest
     public void Eng_UsesSiPrefixes(double value, string unit, string expected) =>
         Assert.Equal(expected, Phys.Eng(value, unit));
 
-    [Fact]
-    public void Eng_ClampsToLargestPrefix() =>
-        Assert.EndsWith("YN", Phys.Eng(1e30, "N"));
+    [Theory]
+    [InlineData(999.7, "1 kN")]
+    [InlineData(999.4, "999 N")]
+    [InlineData(-999_700.0, "-1 MN")]
+    [InlineData(0.0009997, "1 mN")]
+    public void Eng_RollsOverToTheNextPrefix(double value, string expected) =>
+        Assert.Equal(expected, Phys.Eng(value, "N"));
+
+    [Theory]
+    [InlineData(8.05e43, "8.05e43 N")]
+    [InlineData(1e30, "1e30 N")]
+    [InlineData(-2e-30, "-2e-30 N")]
+    public void Eng_BeyondThePrefixesUsesScientificNotation(double value, string expected) =>
+        Assert.Equal(expected, Phys.Eng(value, "N"));
 
     [Fact]
     public void GravitationalConstant_IsCodata2018() => Assert.Equal(6.67430e-11, Phys.G);
