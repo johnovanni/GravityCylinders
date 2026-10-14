@@ -1,0 +1,12 @@
+<Window x:Class="GravityCylinders.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gravity Cylinders" Width="1400" Height="900" Background="#FF14171C">
+    <Grid>
+        <Viewport3D x:Name="Viewport" ClipToBounds="True">
+            <Viewport3D.Camera>
+                <PerspectiveCamera x:Name="Camera" FieldOfView="45" />
+            </Viewport3D.Camera>
+        </Viewport3D>
+    </Grid>
+</Window>

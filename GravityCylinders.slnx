@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GravityCylinders/GravityCylinders.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GravityCylinders.Tests/GravityCylinders.Tests.csproj" />
+  </Folder>
+</Solution>
