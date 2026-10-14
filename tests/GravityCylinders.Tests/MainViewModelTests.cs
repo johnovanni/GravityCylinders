@@ -155,4 +155,17 @@ public class MainViewModelTests : InvariantCultureTest
         Assert.Equal(FrameChoice.Cylinder1, vm.Forces.Frame);
         Assert.Equal(6, calls);                             // both runs completed; the stale one was discarded
     }
+
+    [Fact]
+    public void LambdaBeyondWeakFieldRejected()
+    {
+        var vm = new MainViewModel();
+        vm.Cylinders[0].Lambda = 2e27;   // Gλ/c² ≈ 1.5
+        Assert.Equal(1e12, vm.Cylinders[0].Lambda);
+        Assert.Equal("λ too large: Gλ/c² must stay below 1", vm.ValidationMessage);
+
+        vm.Cylinders[0].Lambda = 1e26;   // Gλ/c² ≈ 0.07: allowed, flagged red
+        Assert.Equal(1e26, vm.Cylinders[0].Lambda);
+        Assert.Equal(BadgeLevel.Red, vm.BadgeLevel);
+    }
 }

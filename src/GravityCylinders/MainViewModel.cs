@@ -156,9 +156,17 @@ public sealed class MainViewModel : ObservableObject
             _directCheck(cylinders, c.Index, forces.FrameBeta),
             c.Pairs.Sum(p => Math.Abs(p.TotalInFrame)))));
 
-    /// <summary>Keeps cylinder 2 between 1 and 3 and stops neighbouring cylinders from overlapping.</summary>
+    /// <summary>Beyond Gλ/c² = 1 a linearised metric is meaningless, so such densities are refused outright.</summary>
+    public const double MaxWeakFieldParameter = 1;
+
+    /// <summary>
+    /// Refuses densities far outside the weak-field model, keeps cylinder 2 between 1 and 3 and stops neighbouring
+    /// cylinders from overlapping.
+    /// </summary>
     private string? Validate(CylinderViewModel changed, Cylinder proposed)
     {
+        if (Phys.G * proposed.Lambda / (Phys.C * Phys.C) >= MaxWeakFieldParameter)
+            return "λ too large: Gλ/c² must stay below 1";
         var all = Cylinders.Select(c => c == changed ? proposed : c.ToCylinder()).ToList();
         if (!(all[0].Y < all[1].Y && all[1].Y < all[2].Y))
             return changed.Index switch
