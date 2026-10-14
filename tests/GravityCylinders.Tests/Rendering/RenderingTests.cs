@@ -132,4 +132,14 @@ public class RenderingTests
         double after = rings.RingPositions(f, 0).First(x => x > before);
         AssertClose(0.95 * RingMarkerRenderer.SceneSpeedAtC * dt, after - before, 1e-9);
     }
+
+    [Fact]
+    public void PairArrows_StayOnShortCylinders()
+    {
+        Cylinder[] scene = [new(1e12, 5, 0.4, -3, 0), new(1e12, 60, 0.4, 0, 0), new(1e12, 60, 0.4, 3, 0)];
+        var f = ForceSolver.Solve(scene, PhysicsModel.GeneralRelativity, FrameChoice.Lab);
+        Assert.Equal(-2.0, ForceArrowRenderer.PairArrowX(f, 0, 0), 12);   // 0.4 × 5 m
+        Assert.Equal(2.0, ForceArrowRenderer.PairArrowX(f, 0, 1), 12);
+        Assert.Equal(-ForceArrowRenderer.PairOffsetX, ForceArrowRenderer.PairArrowX(f, 1, 0), 12);
+    }
 }

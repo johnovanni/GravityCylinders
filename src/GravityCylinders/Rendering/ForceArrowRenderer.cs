@@ -23,6 +23,16 @@ public static class ForceArrowRenderer
     public static Vector3D PairVector(SceneForces f, int on, int source, bool showStrength, double scale) =>
         Arrow(f.Cylinders[on].Pairs.Single(p => p.Source == source).PerFrameLength, Reference(f), showStrength, scale);
 
+    /// <summary>
+    /// x position of the arrow for pair <paramref name="pairIndex"/> on cylinder <paramref name="on"/>: ±PairOffsetX,
+    /// pulled in to ±0.4 of the drawn length so it stays on a short or strongly contracted cylinder.
+    /// </summary>
+    public static double PairArrowX(SceneForces f, int on, int pairIndex)
+    {
+        double x = Math.Min(PairOffsetX, 0.4 * f.Cylinders[on].LengthInFrame);
+        return pairIndex == 0 ? -x : x;
+    }
+
     public static Model3DGroup Build(SceneForces f, IReadOnlyList<Cylinder> cylinders, bool showStrength, double scale)
     {
         var group = new Model3DGroup();
@@ -38,7 +48,7 @@ public static class ForceArrowRenderer
             {
                 var v = PairVector(f, i, pairs[k].Source, showStrength, scale);
                 if (v.Length == 0) continue;
-                double x = k == 0 ? -PairOffsetX : PairOffsetX;
+                double x = PairArrowX(f, i, k);
                 group.Children.Add(ArrowModel(Start(c, x, v), v, 0.07, SceneStyle.ForMaterial(pairs[k].Source)));
             }
         }
