@@ -122,4 +122,14 @@ public class MainViewModelTests : InvariantCultureTest
         var vm = new MainViewModel { SelectedModel = PhysicsModel.SpecialRelativity };
         Assert.Equal(HudFormatter.ModelHelp(PhysicsModel.SpecialRelativity), vm.ModelHelpText);
     }
+
+    [Fact]
+    public void SimultaneityNote_OnlyClaimsFrameDependenceWhenRelativistic()
+    {
+        var vm = new MainViewModel();
+        Assert.Equal(HudFormatter.SimultaneityNote, vm.SimultaneityNote);
+        vm.SelectedModel = PhysicsModel.Newtonian;
+        Assert.DoesNotContain("simultaneity", vm.SimultaneityNote);
+        Assert.Contains("same in every frame", vm.SimultaneityNote);
+    }
 }

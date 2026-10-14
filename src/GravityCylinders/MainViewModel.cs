@@ -86,7 +86,7 @@ public sealed class MainViewModel : ObservableObject
     public BadgeLevel BadgeLevel { get; private set; }
     public string CheckText { get; private set; } = "";
     public string ModelHelpText => HudFormatter.ModelHelp(_model);
-    public string SimultaneityNote => HudFormatter.SimultaneityNote;
+    public string SimultaneityNote => HudFormatter.SimultaneityNoteFor(_model);
 
     public string ValidationMessage { get => _validationMessage; private set => Set(ref _validationMessage, value); }
 
@@ -103,7 +103,7 @@ public sealed class MainViewModel : ObservableObject
         CheckText = _model == PhysicsModel.GeneralRelativity ? CheckLines(cylinders) : HudFormatter.CheckNotApplicable;
 
         foreach (var name in new[] { nameof(Forces), nameof(Rows), nameof(FrameText), nameof(BadgeText), nameof(BadgeLevel),
-                     nameof(CheckText), nameof(ModelHelpText) })
+                     nameof(CheckText), nameof(ModelHelpText), nameof(SimultaneityNote) })
             OnPropertyChanged(name);
         ForcesChanged?.Invoke(this, EventArgs.Empty);
     }

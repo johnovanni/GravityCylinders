@@ -16,6 +16,12 @@ public static class HudFormatter
         "Forces per metre are the same in every frame, but totals are not: the cylinders slide past each other, and " +
         "observers in different frames disagree about which parts overlap \"at the same moment\" (relativity of simultaneity).";
 
+    public const string GalileanNote =
+        "Galilean frames: lengths, clocks and forces — per metre and in total — are the same in every frame.";
+
+    public static string SimultaneityNoteFor(PhysicsModel model) =>
+        model == PhysicsModel.Newtonian ? GalileanNote : SimultaneityNote;
+
     public static (string Text, BadgeLevel Level) Badge(double weakFieldParameter)
     {
         string value = $"Gλ/c² = {weakFieldParameter:0.0e0}";
