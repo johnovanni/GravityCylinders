@@ -23,9 +23,25 @@ public sealed class RingMarkerRenderer
     {
         for (int i = 0; i < Phases.Length && i < forces.Cylinders.Count; i++)
         {
-            double phase = Phases[i] + forces.Cylinders[i].BetaInFrame * SceneSpeedAtC * dt * timeScale;
+            // Phases are kept in proper (rest-frame) metres; the drawing divides by γ, so advance by γ·β·S·dt.
+            var c = forces.Cylinders[i];
+            double phase = Phases[i] + c.Gamma * c.BetaInFrame * SceneSpeedAtC * dt * timeScale;
             Phases[i] = phase - Math.Floor(phase / RingSpacing) * RingSpacing;
         }
+    }
+
+    /// <summary>x positions (frame metres) of cylinder <paramref name="index"/>'s rings within its drawn length.</summary>
+    public IReadOnlyList<double> RingPositions(SceneForces forces, int index)
+    {
+        var f = forces.Cylinders[index];
+        double spacing = RingSpacing / f.Gamma;
+        double half = f.LengthInFrame / 2;
+        double offset = Phases[index] / f.Gamma;
+        double first = offset - Math.Ceiling((offset + half) / spacing) * spacing;
+        var positions = new List<double>();
+        for (double x = first; x <= half; x += spacing)
+            if (x >= -half) positions.Add(x);
+        return positions;
     }
 
     public Model3DGroup Build(SceneForces forces, IReadOnlyList<Cylinder> cylinders)
@@ -34,12 +50,8 @@ public sealed class RingMarkerRenderer
         for (int i = 0; i < cylinders.Count; i++)
         {
             var c = cylinders[i];
-            var f = forces.Cylinders[i];
-            double spacing = RingSpacing / f.Gamma;
-            double half = f.LengthInFrame / 2;
-            double offset = Phases[i] / f.Gamma;
-            double first = offset - Math.Ceiling((offset + half) / spacing) * spacing;
-            for (double x = first; x <= half; x += spacing)
+            double half = forces.Cylinders[i].LengthInFrame / 2;
+            foreach (double x in RingPositions(forces, i))
             {
                 double a = Math.Max(x - RingThickness / 2, -half), b = Math.Min(x + RingThickness / 2, half);
                 if (b - a > 1e-6)

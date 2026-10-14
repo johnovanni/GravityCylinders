@@ -116,4 +116,20 @@ public class RenderingTests
         var bounds = group.Bounds;
         Assert.True(bounds.X >= -30.0 - 1e-9 && bounds.X + bounds.SizeX <= 30.0 + 1e-9);
     }
+
+    [Theory]
+    [InlineData(PhysicsModel.Newtonian)]
+    [InlineData(PhysicsModel.GeneralRelativity)]
+    public void Rings_MoveAtBetaTimesSceneSpeed(PhysicsModel model)
+    {
+        // Final review Important #2: drawn ring speed must be β·SceneSpeedAtC in the frame, not β·S/γ.
+        var scene = Scene(0.95, 0, 0);
+        var f = ForceSolver.Solve(scene, model, FrameChoice.Lab);
+        var rings = new RingMarkerRenderer();
+        double before = rings.RingPositions(f, 0).First(x => x > 0);
+        double dt = 0.01;
+        rings.Advance(f, dt, 1);
+        double after = rings.RingPositions(f, 0).First(x => x > before);
+        AssertClose(0.95 * RingMarkerRenderer.SceneSpeedAtC * dt, after - before, 1e-9);
+    }
 }
