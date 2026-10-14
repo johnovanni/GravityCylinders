@@ -92,6 +92,24 @@ public sealed class MeshBuilder
         }
     }
 
+    /// <summary>A flat disc (triangle fan) facing along <paramref name="normal"/>; used to cap open cylinders.</summary>
+    public void AddDisc(Point3D centre, Vector3D normal, double radius, int sides = 12, double u = 0.5)
+    {
+        if (normal.Length < 1e-12 || radius <= 0) return;
+        var d = normal;
+        d.Normalize();
+        Basis(d, out var bu, out var bv);
+        int centreIndex = _positions.Count;
+        AddVertex(centre, u);
+        for (int i = 0; i < sides; i++)
+        {
+            double ang = 2 * Math.PI * i / sides;
+            AddVertex(centre + (bu * Math.Cos(ang) + bv * Math.Sin(ang)) * radius, u);
+        }
+        for (int i = 0; i < sides; i++)
+            Tri(centreIndex, centreIndex + 1 + i, centreIndex + 1 + (i + 1) % sides);
+    }
+
     public void AddCylinder(Point3D a, Point3D b, double radius, int sides = 12, double u = 0.5)
     {
         var axis = b - a;
