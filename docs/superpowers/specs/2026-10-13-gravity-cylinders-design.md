@@ -17,7 +17,7 @@ Success criteria:
 - Switching the **Model** listbox (Newtonian / Special relativity / General relativity) and the **Frame** listbox
   (Lab / Cylinder 1 / 2 / 3) changes arrows and numbers, and each value is correct within its model (verified by
   tests against analytic results).
-- The force breakdown (Newtonian → × GR factor → ÷ frame factor) is visible for every cylinder.
+- The force breakdown (Newtonian per metre → × GR factor → ÷ γ per element → total over the overlap in the frame) is visible for every cylinder.
 - In GR, an independent calculation done directly in the chosen frame agrees with the rest-frame value transformed
   into that frame, and the app shows the agreement.
 
@@ -48,34 +48,39 @@ of segment j (proper density λⱼ, proper length Lⱼ) and u the source 4-veloc
 
   dp_y/dτ = −m ∂_yΦⱼ · (2(u·U)²/c⁴ − 1) = −m ∂_yΦⱼ · γ_w²(1 + w²/c²).
 
-dp_y/dτ is the force on the element in i's own rest frame. Summing over the elements of i as they lie in j's rest
-frame (i contracted to Lᵢ/γ_w, mass per length γ_w λᵢ) gives the rest-frame force on i from j:
+dp_y/dτ is the force on the element in i's own rest frame, and it depends only on the source's **proper** density.
+So the primary, frame-independent quantity is the force per unit proper length on an interior element of i:
 
-  F_i←j^rest = γ_w²(1 + w²) · F_seg(γ_w λᵢ, Lᵢ/γ_w, λⱼ, Lⱼ, dᵢⱼ).
-
-Computing in the source's rest frame is chosen because Φⱼ is exactly static there. Relativity of simultaneity across
-the finite ends is ignored (steady-state approximation, exact as L/d → ∞).
+  f_i←j = (2G λᵢ λⱼ / dᵢⱼ) · K(wᵢⱼ),   K_GR(w) = γ_w²(1 + w²/c²).
 
 ### 1.3 Special relativity (relativistic kinematics, Newtonian coupling)
-Same as GR but with the coupling factor set to 1:
-F_i←j^rest = F_seg(γ_w λᵢ, Lᵢ/γ_w, λⱼ, Lⱼ, dᵢⱼ). This is not a self-consistent theory of gravity; it isolates what
-relativistic kinematics alone does, and the app's help text says so. GR = SR × γ_w²(1 + w²) exactly, so the
-breakdown is clean.
+Same as GR with K_SR = 1. This is not a self-consistent theory of gravity; it isolates what relativistic kinematics
+alone does, and the app's help text says so. GR = SR × γ_w²(1 + w²) exactly, so the breakdown is clean.
+Newtonian mode: K_N = 1 with Galilean frames.
 
-### 1.4 Frames (SR and GR modes)
-Observer frame k ∈ {Lab, 1, 2, 3} with lab velocity β_k (0 for Lab). Velocity of i in frame k by relativistic
-velocity addition: β_i,k = (βᵢ − β_k)/(1 − βᵢβ_k); γ_ik from it.
-- Force on i in frame k: F_i^k = F_i^rest / γ_ik (transverse momentum is invariant under boosts along x; dt = γ dτ).
-- Length of i in frame k: Lᵢ/γ_ik; density in frame k: γ_ik λᵢ; clock rate 1/γ_ik.
-- Force per unit length in frame k = F_i^k / (Lᵢ/γ_ik) (equals the rest-frame per-proper-length force — shown, since it
-  is a nice invariance).
-- Net force on i = sum over j ≠ i (signed along y; attraction toward j).
+### 1.4 Frames and totals
+Observer frame k ∈ {Lab, 1, 2, 3} with lab velocity β_k (0 for Lab). SR/GR: β_i,k = (βᵢ − β_k)/(1 − βᵢβ_k),
+γ_ik from it. Newtonian: β_i,k = βᵢ − β_k, γ_ik ≡ 1.
+- Per element: force in frame k = dp_y/dt_k = f_i←j / γ_ik per unit proper length (time dilation; p_y is invariant
+  under boosts along x). Per unit length **in frame k** (elements are γ_ik denser) this is f_i←j again — invariant.
+- Length of i in frame k: Lᵢ/γ_ik; clock rate 1/γ_ik.
+- Total force on i in frame k: the elements of i that overlap j *at one instant of frame k* depend on k's
+  simultaneity (sliding cylinders), so totals are computed in frame k's own geometry:
+
+    F_i←j^k = K(wᵢⱼ) · F_seg(λᵢ, Lᵢ/γ_ik, λⱼ, Lⱼ/γ_jk, dᵢⱼ)
+
+  (per-k-length mass of i is γ_ik λᵢ, times 1/γ_ik for dt_k; the source field per element uses its proper density).
+  For long cylinders this is f_i←j × overlap length in frame k, overlap = min(Lᵢ/γ_ik, Lⱼ/γ_jk). Totals therefore
+  differ between frames even though per-length forces do not — a genuine relativity-of-simultaneity effect the HUD
+  points out. With equal proper lengths, rest-frame totals obey F_i←j^(i) = −F_j←i^(j).
+- Net force on i = sum over j ≠ i (signed along y; attraction toward j), both per length and total.
 
 ### 1.5 Independent frame-k check (GR)
-`WeakFieldMetricCheck` builds h_μν(t, x, y, z) for each moving source directly in frame k (source 4-velocity u in
-frame k, Φ from the source's rest-frame geometry at boosted coordinates), takes Christoffel symbols by central finite
-differences, and integrates −m Γʸ_αβ Uᵅ Uᵝ / γ_ik over the elements of i as they lie in frame k. The HUD shows
-"direct in frame k: … (Δ = …%)". Tests assert agreement with §1.4 for long cylinders.
+`WeakFieldMetricCheck` builds h_μν(x⁰, x, y, z) for each moving source directly in frame k (source 4-velocity u in
+frame k; Φⱼ evaluated at the source rest-frame coordinate x′ = γ_jk(x − β_jk x⁰)), takes Christoffel symbols by central
+finite differences, and integrates −c² Γʸ_αβ Uᵅ Uᵝ / γ_ik over the elements of i as they lie in frame k at x⁰ = 0
+(mass per k-length γ_ik λᵢ). The HUD shows "direct in frame k: … (Δ = …%)". Tests assert agreement with §1.4's total
+for long cylinders (it differs only in the end-fringe shape).
 
 ## 2. Scene, inputs and UI
 
@@ -95,8 +100,8 @@ differences, and integrates −m Γʸ_αβ Uᵅ Uᵝ / γ_ik over the elements o
   selected cylinder's rings stand still.
 - On each cylinder: one net force arrow (y direction, at the cylinder's center) and two thinner, color-coded
   per-source arrows. Arrow scaling as in the EM app (√ length scaling with a reference force, or normalized).
-- Force table (one row per cylinder): speed in frame, γ, length in frame, then per source: Newtonian value, × GR
-  factor, ÷ frame factor, value in frame; net force total and per unit length. Plus the frame-k check line and the
+- Force table (one row per cylinder): speed in frame, γ, length in frame, then per source: Newtonian force per
+  metre, × GR factor, ÷ γ_ik (per element), overlap length in frame, total in frame; net force total and per unit length. Plus the frame-k check line and the
   weak-field badge.
 
 ## 3. Architecture
@@ -136,11 +141,11 @@ rings (advanced by frame dt × time scale × frame speed) and arrows. Forces are
 - All velocities zero → all three models give the Newtonian force, in every frame.
 - F_seg → 2Gλ_aλ_b·L/d for L ≫ d; F_seg matches numerical double integration for short segments.
 - GR co-moving cylinders (w = 0) → exactly Newtonian; GR/SR ratio = γ_w²(1 + w²); at small w the GR excess ≈ 2w²/c².
-- Relativistic velocity addition; frame force = rest force / γ_ik; per-unit-length force in frame equals rest per-
-  proper-length force for long cylinders.
-- Rest-frame forces equal and opposite for long cylinders (F_i←j = −F_j←i).
+- Relativistic velocity addition; per-unit-length force in frame k equals f_i←j in every frame; per-element force in
+  frame k = f_i←j / γ_ik; long-cylinder totals = f × overlap in frame k.
+- Equal proper lengths: rest-frame totals equal and opposite (F_i←j^(i) = −F_j←i^(j)).
 - Galilean frames in Newtonian mode: force identical in all frames.
-- WeakFieldMetricCheck agrees with §1.4 within 0.5% for L/d ≥ 100, in all four frames.
+- WeakFieldMetricCheck agrees with §1.4 within 0.2% for L/d = 1000, in all four frames.
 - Middle cylinder between two equal, symmetric co-moving outers → net force zero; counter-moving outers with
   different speeds → nonzero net in GR, zero in Newtonian.
 - View model: ordering constraint, both listboxes change outputs, presets load; HudFormatter/table formatting.
