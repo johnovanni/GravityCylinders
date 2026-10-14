@@ -47,6 +47,12 @@ public sealed class MainViewModel : ObservableObject
             c.Changed += (_, _) =>
             {
                 ValidationMessage = "";
+                if (!_suspendRecalculation && _presetIndex != -1)
+                {
+                    // A manual edit means the scene no longer matches the preset; clearing it lets it be re-applied.
+                    _presetIndex = -1;
+                    OnPropertyChanged(nameof(PresetIndex));
+                }
                 Recalculate();
             };
             Cylinders.Add(c);

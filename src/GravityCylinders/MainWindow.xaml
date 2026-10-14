@@ -76,15 +76,15 @@
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.ColumnSpan="2" Text="{Binding Name}" FontWeight="SemiBold" Margin="0,0,0,4" />
                                     <TextBlock Grid.Row="1" Text="λ (kg/m)" VerticalAlignment="Center" />
-                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Lambda, StringFormat={}{0:G4}}" />
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LambdaText}" />
                                     <TextBlock Grid.Row="2" Text="Length (m)" VerticalAlignment="Center" />
-                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Length}" />
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding LengthText}" />
                                     <TextBlock Grid.Row="3" Text="Radius (m)" VerticalAlignment="Center" />
-                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Radius}" />
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding RadiusText}" />
                                     <TextBlock Grid.Row="4" Text="y (m)" VerticalAlignment="Center" />
-                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Y}" />
+                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding YText}" />
                                     <TextBlock Grid.Row="5" Text="β (v/c)" VerticalAlignment="Center" />
-                                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Beta, StringFormat=0.###}" />
+                                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding BetaText}" />
                                     <Slider Grid.Row="6" Grid.ColumnSpan="2" Minimum="-0.99" Maximum="0.99" Value="{Binding Beta}"
                                             SmallChange="0.01" LargeChange="0.1" Margin="0,4,0,0" />
                                 </Grid>

@@ -168,4 +168,44 @@ public class MainViewModelTests : InvariantCultureTest
         Assert.Equal(1e26, vm.Cylinders[0].Lambda);
         Assert.Equal(BadgeLevel.Red, vm.BadgeLevel);
     }
+
+    [Fact]
+    public void EditingAfterPresetClearsItSoItCanBeReapplied()
+    {
+        var vm = new MainViewModel { PresetIndex = 1 };
+        vm.Cylinders[0].Beta = 0.1;
+        Assert.Equal(-1, vm.PresetIndex);
+        vm.PresetIndex = 1;
+        Assert.Equal([0.5, -0.5, 0.5], vm.Cylinders.Select(c => c.Beta));
+    }
+
+    [Fact]
+    public void NonNumericTextRejectedWithMessage()
+    {
+        var vm = new MainViewModel();
+        var before = vm.Forces;
+        vm.Cylinders[0].LambdaText = "abc";
+        Assert.Equal(1e12, vm.Cylinders[0].Lambda);
+        Assert.Equal("Please enter a number", vm.ValidationMessage);
+        Assert.Same(before, vm.Forces);
+
+        vm.Cylinders[0].LambdaText = "2e12";
+        Assert.Equal(2e12, vm.Cylinders[0].Lambda);
+        Assert.Equal("2E+12", vm.Cylinders[0].LambdaText);
+        vm.Cylinders[1].YText = "0.5";
+        Assert.Equal(0.5, vm.Cylinders[1].Y);
+        vm.Cylinders[2].BetaText = "-0.25";
+        Assert.Equal(-0.25, vm.Cylinders[2].Beta);
+    }
+
+    [Fact]
+    public void TextFollowsValueChanges()
+    {
+        var vm = new MainViewModel();
+        var changed = new List<string?>();
+        vm.Cylinders[0].PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+        vm.Cylinders[0].Beta = 0.3;
+        Assert.Contains(nameof(CylinderViewModel.BetaText), changed);
+        Assert.Equal("0.3", vm.Cylinders[0].BetaText);
+    }
 }
