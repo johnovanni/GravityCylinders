@@ -108,9 +108,10 @@ public class MainViewModelTests : InvariantCultureTest
             new MainViewModel().Presets);
 
     [Fact]
-    public void CheckOnlyInGr()
+    public async Task CheckOnlyInGr()
     {
         var vm = new MainViewModel();
+        await vm.CheckCompletion;
         Assert.Contains("direct metric calculation", vm.CheckText);
         vm.SelectedModel = PhysicsModel.Newtonian;
         Assert.Equal(HudFormatter.CheckNotApplicable, vm.CheckText);
@@ -131,5 +132,27 @@ public class MainViewModelTests : InvariantCultureTest
         vm.SelectedModel = PhysicsModel.Newtonian;
         Assert.DoesNotContain("simultaneity", vm.SimultaneityNote);
         Assert.Contains("same in every frame", vm.SimultaneityNote);
+    }
+
+    [Fact]
+    public async Task MetricCheck_RunsOffTheInputThreadAndKeepsOnlyTheLatestResult()
+    {
+        // Final review Important #1: the ~40 ms direct check must not block input changes (slider drags).
+        using var gate = new ManualResetEventSlim(false);
+        int calls = 0;
+        var vm = new MainViewModel((cylinders, on, frameBeta) =>
+        {
+            if (Interlocked.Increment(ref calls) <= 3) gate.Wait();   // the first (default-scene) check blocks
+            return WeakFieldMetricCheck.NetForceInFrame(cylinders, on, frameBeta, 200);
+        });
+        var firstRun = vm.CheckCompletion;
+        vm.SelectedFrame = FrameChoice.Cylinder1;           // returns although the first check is still blocked
+        Assert.Equal(HudFormatter.CheckComputing, vm.CheckText);
+        gate.Set();
+        await firstRun;
+        await vm.CheckCompletion;
+        Assert.Contains("direct metric calculation", vm.CheckText);
+        Assert.Equal(FrameChoice.Cylinder1, vm.Forces.Frame);
+        Assert.Equal(6, calls);                             // both runs completed; the stale one was discarded
     }
 }

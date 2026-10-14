@@ -24,9 +24,21 @@ public sealed class MainViewModel : ObservableObject
     private double _arrowScale = 1, _timeScale = 1;
     private string _validationMessage = "";
     private bool _suspendRecalculation;
+    private readonly Func<IReadOnlyList<Cylinder>, int, double, double> _directCheck;
+    private readonly SynchronizationContext? _ui;
+    private int _checkVersion;
 
     public MainViewModel()
+        : this((cylinders, on, frameBeta) => WeakFieldMetricCheck.NetForceInFrame(cylinders, on, frameBeta, CheckSamples))
     {
+    }
+
+    /// <param name="directCheck">Net force on cylinder `on` in the frame moving at `frameBeta`, computed directly from the
+    /// metric. It runs on a background thread because it takes tens of milliseconds.</param>
+    public MainViewModel(Func<IReadOnlyList<Cylinder>, int, double, double> directCheck)
+    {
+        _directCheck = directCheck;
+        _ui = SynchronizationContext.Current;
         double[] ys = [-3, 0, 3];
         for (int i = 0; i < 3; i++)
         {
@@ -85,6 +97,9 @@ public sealed class MainViewModel : ObservableObject
     public string BadgeText { get; private set; } = "";
     public BadgeLevel BadgeLevel { get; private set; }
     public string CheckText { get; private set; } = "";
+
+    /// <summary>Completes when the latest background metric check has finished (for tests and diagnostics).</summary>
+    public Task CheckCompletion { get; private set; } = Task.CompletedTask;
     public string ModelHelpText => HudFormatter.ModelHelp(_model);
     public string SimultaneityNote => HudFormatter.SimultaneityNoteFor(_model);
 
@@ -100,7 +115,7 @@ public sealed class MainViewModel : ObservableObject
         Rows = ForceTableBuilder.Build(Forces);
         FrameText = HudFormatter.Frame(Forces);
         (BadgeText, BadgeLevel) = HudFormatter.Badge(Forces.WeakFieldParameter);
-        CheckText = _model == PhysicsModel.GeneralRelativity ? CheckLines(cylinders) : HudFormatter.CheckNotApplicable;
+        StartCheck(cylinders);
 
         foreach (var name in new[] { nameof(Forces), nameof(Rows), nameof(FrameText), nameof(BadgeText), nameof(BadgeLevel),
                      nameof(CheckText), nameof(ModelHelpText), nameof(SimultaneityNote) })
@@ -108,11 +123,37 @@ public sealed class MainViewModel : ObservableObject
         ForcesChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private string CheckLines(IReadOnlyList<Cylinder> cylinders) =>
-        string.Join(Environment.NewLine, Forces.Cylinders.Select(c => HudFormatter.Check(
+    /// <summary>Runs the direct metric check in the background; a result is shown only if no newer input arrived.</summary>
+    private void StartCheck(IReadOnlyList<Cylinder> cylinders)
+    {
+        int version = Interlocked.Increment(ref _checkVersion);
+        if (_model != PhysicsModel.GeneralRelativity)
+        {
+            CheckText = HudFormatter.CheckNotApplicable;
+            CheckCompletion = Task.CompletedTask;
+            return;
+        }
+        CheckText = HudFormatter.CheckComputing;
+        var forces = Forces;
+        CheckCompletion = Task.Run(() => CheckLines(cylinders, forces)).ContinueWith(t =>
+        {
+            if (!t.IsCompletedSuccessfully) return;
+            void Publish()
+            {
+                if (version != Volatile.Read(ref _checkVersion)) return;
+                CheckText = t.Result;
+                OnPropertyChanged(nameof(CheckText));
+            }
+            if (_ui != null) _ui.Post(_ => Publish(), null);
+            else Publish();
+        }, TaskScheduler.Default);
+    }
+
+    private string CheckLines(IReadOnlyList<Cylinder> cylinders, SceneForces forces) =>
+        string.Join(Environment.NewLine, forces.Cylinders.Select(c => HudFormatter.Check(
             ForceTableBuilder.CylinderName(c.Index),
             c.NetTotal,
-            WeakFieldMetricCheck.NetForceInFrame(cylinders, c.Index, Forces.FrameBeta, CheckSamples),
+            _directCheck(cylinders, c.Index, forces.FrameBeta),
             c.Pairs.Sum(p => Math.Abs(p.TotalInFrame)))));
 
     /// <summary>Keeps cylinder 2 between 1 and 3 and stops neighbouring cylinders from overlapping.</summary>

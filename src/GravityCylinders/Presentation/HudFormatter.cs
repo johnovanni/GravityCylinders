@@ -11,6 +11,7 @@ public static class HudFormatter
     public const double RedThreshold = 1e-2;
 
     public const string CheckNotApplicable = "Direct metric calculation: n/a (GR only)";
+    public const string CheckComputing = "Direct metric calculation: computing…";
 
     public const string SimultaneityNote =
         "Forces per metre are the same in every frame, but totals are not: the cylinders slide past each other, and " +
