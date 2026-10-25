@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <clipPath id="tile"><rect width="1024" height="1024" rx="200"/></clipPath>
+    <linearGradient id="violet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EBB8FF"/><stop offset="0.45" stop-color="#C77DFF"/><stop offset="1" stop-color="#8E44C9"/></linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FE0FF"/><stop offset="0.45" stop-color="#3FA9F5"/><stop offset="1" stop-color="#1E6FB8"/></linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD29A"/><stop offset="0.45" stop-color="#FF9F43"/><stop offset="1" stop-color="#C96A16"/></linearGradient>
+    <marker id="head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3" markerHeight="3" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#FFFFFF"/>
+    </marker>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="1024" height="1024" fill="#14171E"/>
+    <g transform="translate(512 512) rotate(-28)">
+      <g>
+        <rect x="-560" y="-250" width="1120" height="96" rx="48" fill="url(#violet)"/>
+        <rect x="-560" y="-48" width="1120" height="96" rx="48" fill="url(#blue)"/>
+        <rect x="-560" y="154" width="1120" height="96" rx="48" fill="url(#orange)"/>
+      </g>
+      <g stroke="#FFFFFF" stroke-width="14" opacity="0.9">
+        <path d="M-420 -250 v96 M-210 -250 v96 M0 -250 v96 M210 -250 v96 M420 -250 v96"/>
+        <path d="M-420 -48 v96 M-210 -48 v96 M0 -48 v96 M210 -48 v96 M420 -48 v96"/>
+        <path d="M-420 154 v96 M-210 154 v96 M0 154 v96 M210 154 v96 M420 154 v96"/>
+      </g>
+      <!-- mutual gravitational pull -->
+      <g stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" marker-end="url(#head)">
+        <line x1="-105" y1="-140" x2="-105" y2="-74"/>
+        <line x1="-105" y1="-62" x2="-105" y2="-128" opacity="0"/>
+        <line x1="105" y1="-62" x2="105" y2="-126"/>
+        <line x1="105" y1="62" x2="105" y2="128"/>
+        <line x1="-105" y1="140" x2="-105" y2="74"/>
+      </g>
+    </g>
+  </g>
+</svg>

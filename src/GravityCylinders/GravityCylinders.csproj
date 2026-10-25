@@ -8,6 +8,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>GravityCylinders</RootNamespace>
     <AssemblyName>GravityCylinders</AssemblyName>
+    <ApplicationIcon>Assets\GravityCylinders.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\GravityCylinders.ico" />
+  </ItemGroup>
 
 </Project>
